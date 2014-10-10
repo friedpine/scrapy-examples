@@ -1,5 +1,6 @@
 import re
 import json
+import sys
 
 
 from scrapy.selector import Selector
@@ -19,13 +20,15 @@ from misc.log import *
 class DoubanBookSpider(CrawlSpider):
     name = "doubanbook"
     allowed_domains = ["douban.com"]
+    download_delay = 1  
     start_urls = [
-        "http://book.douban.com/tag/"
-    ]
+        #"http://book.douban.com/tag/"
+    	"http://book.douban.com/doulist/1556952/?start=0&amp;filter="
+	]
     rules = [
         Rule(sle(allow=("/subject/\d+/?$")), callback='parse_2'),
-        Rule(sle(allow=("/tag/[^/]+/?$", )), follow=True),
-        Rule(sle(allow=("/tag/$", )), follow=True),
+        #Rule(sle(allow=("/tag/[^/]+/?$", )), follow=True),
+        #Rule(sle(allow=("/tag/$", )), follow=True),
     ]
 
     def parse_2(self, response):
@@ -38,7 +41,8 @@ class DoubanBookSpider(CrawlSpider):
             item['link'] = response.url
             item['content_intro'] = site.css('#link-report .intro p::text').extract()
             items.append(item)
-            print repr(item).decode("unicode-escape") + '\n'
+            a=repr(item)
+            print a.decode('utf-8').decode('unicode-escape')
         # info('parsed ' + str(response))
         return items
 
