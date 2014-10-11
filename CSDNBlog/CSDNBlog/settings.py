@@ -1,3 +1,9 @@
+import sys
+import os
+from os.path import dirname
+path = dirname(dirname(os.path.abspath(os.path.dirname(__file__))))
+sys.path.append(path)
+
 BOT_NAME = 'CSDNBlog'
 
 SPIDER_MODULES = ['CSDNBlog.spiders']
@@ -11,4 +17,4 @@ ITEM_PIPELINES = {
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'CSDNBlog (+http://www.yourdomain.com)'
-T_NAME = 'CSDNBlog'
+#T_NAME = 'CSDNBlog'

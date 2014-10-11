@@ -1,13 +1,20 @@
-#!/usr/bin/python
-# -*- coding:utf-8 -*-
+import re
+import json
+import sys
+import os
+from os.path import dirname
 
-# from scrapy.contrib.spiders import  CrawlSpider,Rule
+
+path = dirname(dirname(os.path.abspath(os.path.dirname(__file__))))
+sys.path.append(path)
+print path
 
 from scrapy.spider import Spider
 from scrapy.http import Request
 from scrapy.selector import Selector
-from CSDNBlog.items import CsdnblogItem
 
+#from CSDNBlog.items import *
+from items import *
 
 class CSDNBlogSpider(Spider):
 
@@ -16,14 +23,10 @@ class CSDNBlogSpider(Spider):
     download_delay = 1
     allowed_domains = ["blog.csdn.net"]
     start_urls = [
-
-        "http://blog.csdn.net/u012150179/article/details/11749017"
-    ]
+        "http://blog.csdn.net/u012150179/article/details/11749017"]
 
     def parse(self, response):
         sel = Selector(response)
-
-        #items = []
         item = CsdnblogItem()
 
         article_url = str(response.url)
@@ -31,7 +34,6 @@ class CSDNBlogSpider(Spider):
 
         item['article_name'] = [n.encode('utf-8') for n in article_name]
         item['article_url'] = article_url.encode('utf-8')
-
         yield item
 
         urls = sel.xpath('//li[@class="next_article"]/a/@href').extract()
