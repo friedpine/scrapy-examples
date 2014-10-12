@@ -19,41 +19,42 @@ from misc.log import *
 
 class wallstreetcn_Spider(CrawlSpider):
 	name = "wallstreetcn"
-	allowed_domains = ["wallstreetcn.com"]
+	allowed_domains = ["wallstreetcn.com","m.wallstreetcn.com"]
 	download_delay = 0.1
 	start_urls = [
-		"http://wallstreetcn.com/news?status=published&type=news&order=-created_at&limit=100&page=1"
-		#"http://wallstreetcn.com"
+		#"http://wallstreetcn.com/news?status=published&type=news&order=-created_at&limit=100&page=1"
+		"http://wallstreetcn.com"
 	]
 	rules = [
-		Rule(LinkExtractor(allow=("m\.wallstreetcn\.com/node/",)),callback='parse_1'),
-		Rule(LinkExtractor(allow=("/node/\d+",)),callback='parse_2'),
+		Rule(LinkExtractor(allow=("m\.wallstreetcn\.com/node/",)),callback='parse_1',follow=True),
+		Rule(LinkExtractor(allow=("/node/\d+",),deny=("m\.wallstreetcn\.com")),callback='parse_2',follow=True),
 	]
 
-	def parse_2(self,response):
+	def parse_1(self,response):
+
 		sel = Selector(response)
 		item = WallstreetcnItem()
 		article_url = str(response.url)
-		print article_url
-
-		article_name = sel.xpath("//*[@id='main']/article/h1/text()").extract()[0]
-		article_content = ''.join(response.xpath("//*[@id='main']/article/div[2]//p/text()").extract())
+		print "###################",article_url
+		article_name = sel.xpath("/html/body/div[1]/div[2]/div/h2/text()").extract()[0]
+		article_content = ''.join(response.xpath("/html/body/div[1]/div[2]/div/div[2]/p/text()").extract())
 
 		item['title'] = article_name
 		item['link'] = article_url
 		item['content'] = article_content
 		return item
 
-	def parse_1(self,response):
-
-		#/html/body/div[1]/div[2]/div/h2
+	def parse_2(self,response):
 		sel = Selector(response)
 		item = WallstreetcnItem()
 		article_url = str(response.url)
 		print article_url
-		
-		article_name = sel.xpath("/html/body/div[1]/div[2]/div/h2/text()").extract()[0]
-		article_content = ''.join(response.xpath("/html/body/div[1]/div[2]/div/div[2]/p/text()").extract())
+		try:
+			article_name = sel.xpath("//*[@id='main']/article/h1/text()").extract()[0]
+			article_content = ''.join(response.xpath("//*[@id='main']/article/div[2]//p/text()").extract())
+		except:
+			article_name = sel.xpath("/html/body/div[1]/div[2]/div/h2/text()").extract()[0]
+			article_content = ''.join(response.xpath("/html/body/div[1]/div[2]/div/div[2]/p/text()").extract())
 
 		item['title'] = article_name
 		item['link'] = article_url
