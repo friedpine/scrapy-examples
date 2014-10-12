@@ -11,13 +11,9 @@ import codecs
 
 class WallstreetcnPipeline(object):
 
-<<<<<<< HEAD
-    def __init__(self):
-        self.file = codecs.open('WallstreetcnData.json', 'wb', encoding='utf-8')
-=======
+
 	def __init__(self):
 		self.file = codecs.open('WallstreetcnData.json', 'w', encoding='utf-8')
->>>>>>> FETCH_HEAD
 
 	def process_item(self, item, spider):
 		print item
