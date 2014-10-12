@@ -35,6 +35,8 @@ class DoubanBookSpider(CrawlSpider):
         items = []
         sel = Selector(response)
         sites = sel.css('#wrapper')
+        print "#################"
+        print response.url
         for site in sites:
             item = DoubanSubjectItem()
             item['title'] = site.css('h1 span::text').extract()
