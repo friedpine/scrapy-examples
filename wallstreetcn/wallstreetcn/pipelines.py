@@ -16,11 +16,10 @@ class WallstreetcnPipeline(object):
 		self.file = codecs.open('WallstreetcnData.json', 'w', encoding='utf-8')
 
 	def process_item(self, item, spider):
-		print item
-		line = json.dumps(dict(item),ensure_ascii=False)+"\n"
+		line = json.dumps(dict(item),ensure_ascii=False) + "\n"
 		self.file.write(line)
 		return item
 
-	def spider_closed(self,spider):
+	def spider_closed(self, spider):
 		self.file.close()
-
+ 

@@ -10,7 +10,7 @@ except:
     from scrapy.spider import BaseSpider as Spider
 from scrapy.utils.response import get_base_url
 from scrapy.contrib.spiders import CrawlSpider, Rule
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor as sle
+from scrapy.contrib.linkextractors import LinkExtractor
 
 
 #from wallstreetcn.items import *
@@ -20,24 +20,24 @@ from misc.log import *
 class wallstreetcn_Spider(CrawlSpider):
 	name = "wallstreetcn"
 	allowed_domains = ["wallstreetcn.com"]
-	download_delay = 1
+	download_delay = 0.1
 	start_urls = [
-		"http://wallstreetcn.com/news?status=published&type=news&order=-created_at&limit=10&page=1"
+		"http://wallstreetcn.com/news?status=published&type=news&order=-created_at&limit=100&page=1"
 		#"http://wallstreetcn.com"
 	]
 	rules = [
-		Rule(sle(allow=("m.wallstreetcn")),callback='parse_1'),
-		Rule(sle(allow=("/node/\d+")),callback='parse_2'),
+		Rule(LinkExtractor(allow=("m\.wallstreetcn\.com/node/",)),callback='parse_1'),
+		Rule(LinkExtractor(allow=("/node/\d+",)),callback='parse_2'),
 	]
 
 	def parse_2(self,response):
 		sel = Selector(response)
 		item = WallstreetcnItem()
-		print "###############################################################################"
-		article_url = str(response.url).encode('utf-8')
+		article_url = str(response.url)
 		print article_url
-		article_name = sel.xpath("//*[@id='main']/article/h1/text()").extract()[0].encode('utf-8')
-		article_content = ''.join(response.xpath("//*[@id='main']/article/div[2]//p/text()").extract()).encode('utf-8')
+
+		article_name = sel.xpath("//*[@id='main']/article/h1/text()").extract()[0]
+		article_content = ''.join(response.xpath("//*[@id='main']/article/div[2]//p/text()").extract())
 
 		item['title'] = article_name
 		item['link'] = article_url
@@ -45,8 +45,20 @@ class wallstreetcn_Spider(CrawlSpider):
 		return item
 
 	def parse_1(self,response):
-		print str(response.url)
-		print "##############mobile"
+
+		#/html/body/div[1]/div[2]/div/h2
+		sel = Selector(response)
+		item = WallstreetcnItem()
+		article_url = str(response.url)
+		print article_url
+		
+		article_name = sel.xpath("/html/body/div[1]/div[2]/div/h2/text()").extract()[0]
+		article_content = ''.join(response.xpath("/html/body/div[1]/div[2]/div/div[2]/p/text()").extract())
+
+		item['title'] = article_name
+		item['link'] = article_url
+		item['content'] = article_content
+		return item
 
 	def _process_request(self, request):
 		info('process ' + str(request))
